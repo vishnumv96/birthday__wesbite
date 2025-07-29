@@ -3,10 +3,12 @@ import os
 
 app = Flask(__name__)
 
+
 @app.route('/')
 def home():
     image_folder = os.path.join('static', 'images')
-    image_files = [f for f in os.listdir(image_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
+    image_files = [f for f in os.listdir(image_folder) if f.lower().endswith(
+        ('.png', '.jpg', '.jpeg', '.gif'))]
 
     captions = [
         "Best moments with you 🥰",
@@ -16,8 +18,11 @@ def home():
         "To many more adventures 🚀"
     ]
 
-    images = [{'file': f, 'caption': captions[i % len(captions)]} for i, f in enumerate(image_files)]
+    images = [{'file': f, 'caption': captions[i % len(
+        captions)]} for i, f in enumerate(image_files)]
     return render_template('index.html', images=images)
 
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 10000))
+    app.run(host='0.0.0.0', port=port)
