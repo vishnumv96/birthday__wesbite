@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Happy Birthday!</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            text-align: center;
+            overflow-x: hidden;
+            background: radial-gradient(#0d0221, #19062d);
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/stardust.png');
+            opacity: 0.3;
+            z-index: -2;
+            animation: twinkle 10s linear infinite;
+        }
+
+        @keyframes twinkle {
+            0% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+
+            100% {
+                opacity: 0.3;
+            }
+        }
+
+        h1 {
+            color: deeppink;
+            font-size: 50px;
+            margin-top: 30px;
+        }
+
+        p {
+            font-size: 20px;
+            color: #ffd6ff;
+            margin: 10px 0 30px;
+        }
+
+        .carousel-background {
+            margin: 0 auto;
+            margin-top: 40px;
+            padding: 30px 0;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 800px;
+            height: 350px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .blurred-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            filter: blur(15px);
+            z-index: 0;
+            transition: background-image 1s ease-in-out;
+        }
+
+        .blurred-bg::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            perspective: 1000px;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-style: preserve-3d;
+        }
+
+        .carousel {
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 1s;
+            position: relative;
+        }
+
+        .carousel img {
+            position: absolute;
+            width: 220px;
+            height: 320px;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.5s, opacity 0.5s;
+            left: calc(50% - 110px);
+            top: 15px;
+        }
+
+        #countdown-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 3em;
+            z-index: 9999;
+        }
+
+        #main-content {
+            display: none;
+        }
+
+        #music-control {
+            margin-top: 10px;
+            font-size: 1.5em;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="countdown-screen">
+        <div id="countdown">5</div>
+        <div style="font-size:0.4em; margin-top:10px;">🎉 Let's Begin the Celebration! 🎉</div>
+    </div>
+
+    <div id="main-content">
+        <h1 class="typing">🎉 Happy Birthday, My Best Friend Amminiii.....! 🎉</h1>
+        <p>Dear Best Friend,<br>Wishing you all the joy and happiness!</p>
+
+        <audio id="bg-music" autoplay loop muted>
+            <source src="{{ url_for('static', filename='music/happy_birthday.mp3') }}" type="audio/mpeg">
+        </audio>
+        <button id="music-control" title="Toggle Music">🎵</button>
+
+        <div class="countdown" id="live-countdown"></div>
+        <div id="messages"></div>
+
+        <div class="carousel-background" id="carousel-bg">
+            <div class="blurred-bg" id="blurred"></div>
+            <div class="carousel-container">
+                <div class="carousel" id="carousel">
+                    {% for image in images %}
+                    <img src="{{ url_for('static', filename='images/' + image['file']) }}" alt="Slide">
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.9.1/dist/fireworks.js"></script>
+
+    <script>
+        // Countdown screen
+        let counter = 5;
+        const countdownDiv = document.getElementById("countdown");
+        const countdownScreen = document.getElementById("countdown-screen");
+        const mainContent = document.getElementById("main-content");
+
+        const interval = setInterval(() => {
+            counter--;
+            countdownDiv.textContent = counter;
+            if (counter === 0) {
+                clearInterval(interval);
+                countdownScreen.style.display = "none";
+                mainContent.style.display = "block";
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                const fireworks = new Fireworks(document.body);
+                fireworks.start();
+            }
+        }, 1000);
+
+        // Birthday countdown
+
+        // Messages
+        const messages = [
+            "You make every moment special ❤️",
+            "May all your dreams come true ✨",
+            "You’re one in a million! 🎁",
+            "Enjoy your day to the fullest 🎊",
+            "Sending hugs and love 💖"
+        ];
+        let msgIndex = 0;
+        const msgBox = document.getElementById("messages");
+        function showMessage() {
+            msgBox.innerText = messages[msgIndex];
+            msgIndex = (msgIndex + 1) % messages.length;
+        }
+        showMessage();
+        setInterval(showMessage, 4000);
+
+        // Carousel
+        const carousel = document.getElementById("carousel");
+        const images = carousel.getElementsByTagName("img");
+        const blurredBg = document.getElementById("blurred");
+        const total = images.length;
+        let angle = 0;
+        let frontIndex = 0;
+
+        function updateBackground(index) {
+            blurredBg.style.backgroundImage = `url('${images[index].src}')`;
+        }
+
+        for (let i = 0; i < total; i++) {
+            const theta = (360 / total) * i;
+            images[i].style.transform = `rotateY(${theta}deg) translateZ(500px)`;
+        }
+
+        function rotateCarousel() {
+            frontIndex = (frontIndex + 1) % total;
+            angle += 360 / total;
+            carousel.style.transform = `rotateY(${angle}deg)`;
+            updateBackground(frontIndex);
+        }
+
+        updateBackground(frontIndex);
+        setInterval(rotateCarousel, 3000);
+
+        // Music toggle
+        const music = document.getElementById('bg-music');
+        const button = document.getElementById('music-control');
+        let musicStarted = false;
+
+        button.addEventListener('click', () => {
+            if (!musicStarted) {
+                music.muted = false;
+                music.play();
+                musicStarted = true;
+                button.textContent = "🔇";
+            } else {
+                if (music.paused) {
+                    music.play();
+                    button.textContent = "🔇";
+                } else {
+                    music.pause();
+                    button.textContent = "🎵";
+                }
+            }
+        });
+
+        // Unmute on click anywhere
+        window.addEventListener("click", () => {
+            if (!musicStarted) {
+                music.muted = false;
+                music.play();
+                musicStarted = true;
+                button.textContent = "🔇";
+            }
+        });
+    </script>
+</body>
+
+</html>
